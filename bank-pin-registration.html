@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rural Bank of Calbayog City — PIN Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #10141c;
+    --card: #131720;
+    --border: #1e2535;
+    --border-glow: #2a3a5c;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #6b5520;
+    --text: #d8dde8;
+    --text-muted: #5a6480;
+    --text-soft: #8a94b0;
+    --success: #2fd67a;
+    --error: #f05a5a;
+    --info: #4a90d9;
+    --pin-bg: #0e121a;
+    --pin-border: #252c3e;
+    --pin-active: #c9a84c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Atmospheric background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(74,144,217,0.03) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.012) 39px, rgba(255,255,255,0.012) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.012) 39px, rgba(255,255,255,0.012) 40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 520px;
+    padding: 24px 16px;
+  }
+
+  /* Header */
+  .bank-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .bank-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--gold), #8a6018);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.25);
+  }
+
+  .bank-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+  }
+
+  .bank-tagline {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    animation: fadeUp 0.7s ease 0.1s both;
+  }
+
+  .card-header {
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(201,168,76,0.04) 0%, transparent 100%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .step-badge {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+  }
+
+  .step-badge.active {
+    background: rgba(201,168,76,0.12);
+    border-color: var(--gold);
+    box-shadow: 0 0 12px rgba(201,168,76,0.2);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .card-body {
+    padding: 32px;
+  }
+
+  /* Form sections */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .field-group {
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    width: 100%;
+    background: var(--pin-bg);
+    border: 1px solid var(--pin-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+
+  select option { background: #1a1f2e; color: var(--text); }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* PIN display */
+  .pin-display-wrapper {
+    background: var(--pin-bg);
+    border: 1px solid var(--pin-border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pin-display-wrapper::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+  }
+
+  .pin-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  .pin-digits {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .pin-digit {
+    width: 44px; height: 52px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--gold-light);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pin-digit.revealed {
+    border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.06);
+    animation: popIn 0.3s ease both;
+  }
+
+  .pin-digit.hidden-pin {
+    font-size: 28px;
+    color: var(--text-muted);
+    letter-spacing: -2px;
+  }
+
+  .pin-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--border-glow);
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #a07520);
+    color: #0a0c10;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(201,168,76,0.25);
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(201,168,76,0.35);
+  }
+
+  .btn-gold:active { transform: translateY(0); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+
+  /* PIN verification dots */
+  .verify-dots {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .verify-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--pin-border);
+    background: transparent;
+    transition: all 0.25s ease;
+  }
+
+  .verify-dot.filled {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(201,168,76,0.4);
+    transform: scale(1.1);
+  }
+
+  .verify-dot.error {
+    background: var(--error);
+    border-color: var(--error);
+    animation: shake 0.4s ease;
+  }
+
+  .verify-dot.success {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  /* Numpad */
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .key {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 0;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .key:hover { background: rgba(255,255,255,0.08); border-color: var(--border-glow); }
+  .key:active { transform: scale(0.95); background: rgba(201,168,76,0.1); border-color: var(--gold-dim); }
+
+  .key.key-del {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .key.key-empty { visibility: hidden; }
+
+  /* Status messages */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    font-size: 13px;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .status-bar.info { background: rgba(74,144,217,0.08); border: 1px solid rgba(74,144,217,0.2); color: var(--info); }
+  .status-bar.success { background: rgba(47,214,122,0.08); border: 1px solid rgba(47,214,122,0.2); color: var(--success); }
+  .status-bar.error { background: rgba(240,90,90,0.08); border: 1px solid rgba(240,90,90,0.2); color: var(--error); }
+  .status-bar.warning { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); color: var(--gold); }
+
+  /* Progress steps */
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 32px;
+    animation: fadeDown 0.7s ease 0.05s both;
+  }
+
+  .prog-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .prog-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .prog-dot.done { background: rgba(47,214,122,0.15); border-color: var(--success); color: var(--success); }
+  .prog-dot.current { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.25); }
+
+  .prog-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 0.4s;
+  }
+
+  .prog-dot.current ~ .prog-label, .prog-step.current .prog-label { color: var(--gold); }
+  .prog-step.done .prog-label { color: var(--success); }
+
+  .prog-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    min-width: 40px;
+    max-width: 60px;
+    margin-bottom: 18px;
+    transition: background 0.4s;
+    position: relative;
+  }
+
+  .prog-line.done { background: var(--success); }
+
+  /* Strength meter */
+  .strength-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+  }
+  .strength-bar {
+    flex: 1; height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  /* Success screen */
+  .success-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(47,214,122,0.1);
+    border: 2px solid var(--success);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 30px rgba(47,214,122,0.2);
+    animation: scaleIn 0.5s ease both;
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+
+  .success-detail {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .account-summary {
+    background: var(--pin-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: var(--text-muted); }
+  .summary-val { color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; }
+  .summary-val.gold { color: var(--gold); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  .verify-title {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .verify-hint {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+  }
+
+  /* PIN toggle */
+  .pin-reveal-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    padding: 4px 8px;
+  }
+
+  .pin-reveal-btn:hover { color: var(--gold); }
+
+  /* Animations */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px); }  to { opacity:1; transform:translateY(0); } }
+  @keyframes popIn    { from { transform:scale(0.6); opacity:0; } to { transform:scale(1); opacity:1; } }
+  @keyframes shake    { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+  @keyframes scaleIn  { from { transform:scale(0.5); opacity:0; } to { transform:scale(1); opacity:1; } }
+  @keyframes spin     { to { transform:rotate(360deg); } }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .spin { animation: spin 0.8s linear infinite; }
+  .pulse { animation: pulse 1.5s ease infinite; }
+
+  @media (max-width: 500px) {
+    .card-body { padding: 24px 20px; }
+    .field-row { grid-template-columns: 1fr; }
+    .pin-digit { width: 38px; height: 46px; font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Bank Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <div class="logo-icon">🏦</div>
+      <span class="bank-name">Rural Bank of Calbayog City</span>
+    </div>
+    <div class="bank-tagline">Digital Banking — Secure PIN Management</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-steps" id="progressBar">
+    <div class="prog-step" id="ps1">
+      <div class="prog-dot current" id="pd1">1</div>
+      <div class="prog-label">Account</div>
+    </div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2">
+      <div class="prog-dot" id="pd2">2</div>
+      <div class="prog-label">Generate PIN</div>
+    </div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3">
+      <div class="prog-dot" id="pd3">3</div>
+      <div class="prog-label">Verify PIN</div>
+    </div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4">
+      <div class="prog-dot" id="pd4">✓</div>
+      <div class="prog-label">Complete</div>
+    </div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- SECTION 1: Account Details -->
+    <div id="sec1" class="section active">
+      <div class="card-header">
+        <div class="step-badge active">01</div>
+        <div>
+          <div class="card-title">Client Account Details</div>
+          <div class="card-subtitle">Enter your registered banking information</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field-group">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="Maria" />
+          </div>
+          <div class="field-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="Santos" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Account Number</label>
+          <input type="text" id="accountNumber" placeholder="e.g. 1234-5678-9012" maxlength="16" />
+        </div>
+        <div class="field-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="maria.santos@email.com" />
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Account Type</label>
+            <select id="accountType">
+              <option value="">Select type</option>
+              <option value="savings">Savings Account</option>
+              <option value="checking">Checking Account</option>
+              <option value="credit">Credit Card</option>
+              <option value="payroll">Payroll Account</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Date of Birth</label>
+            <input type="text" id="dob" placeholder="MM/DD/YYYY" maxlength="10" />
+          </div>
+        </div>
+        <div id="sec1Status"></div>
+        <button class="btn btn-gold btn-primary" onclick="goToStep2()">
+          Continue →
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Generate PIN -->
+    <div id="sec2" class="section">
+      <div class="card-header">
+        <div class="step-badge active">02</div>
+        <div>
+          <div class="card-title">PIN Generation</div>
+          <div class="card-subtitle">A secure 6-digit PIN will be generated for you</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pin-display-wrapper">
+          <div class="pin-label">Your Assigned PIN</div>
+          <div class="pin-digits" id="pinDigits">
+            <div class="pin-digit hidden-pin" id="pd_0">•</div>
+            <div class="pin-digit hidden-pin" id="pd_1">•</div>
+            <div class="pin-digit hidden-pin" id="pd_2">•</div>
+            <div class="pin-digit hidden-pin" id="pd_3">•</div>
+            <div class="pin-digit hidden-pin" id="pd_4">•</div>
+            <div class="pin-digit hidden-pin" id="pd_5">•</div>
+          </div>
+          <div class="pin-actions">
+            <button class="btn btn-ghost" onclick="generatePIN()">⟳ Generate New</button>
+            <button class="btn btn-ghost" id="revealBtn" onclick="toggleReveal()" disabled>👁 Reveal PIN</button>
+          </div>
+        </div>
+
+        <div class="strength-row" id="strengthRow" style="display:none">
+          <div class="strength-bar" id="sb0"></div>
+          <div class="strength-bar" id="sb1"></div>
+          <div class="strength-bar" id="sb2"></div>
+          <div class="strength-bar" id="sb3"></div>
+          <div class="strength-bar" id="sb4"></div>
+        </div>
+
+        <div class="status-bar info" id="pinInfo" style="display:none">
+          <span>🔒</span>
+          <span>Your PIN has been generated. Memorize it carefully — you will need it on the next step.</span>
+        </div>
+
+        <hr class="divider" />
+
+        <div id="sec2Status"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center;padding:14px;" onclick="goToStep1()">← Back</button>
+          <button class="btn btn-gold" style="flex:2;justify-content:center;padding:14px;border-radius:10px;font-size:14px;font-weight:600;" id="confirmPinBtn" onclick="goToStep3()" disabled>
+            I've Memorized My PIN →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Verify PIN -->
+    <div id="sec3" class="section">
+      <div class="card-header">
+        <div class="step-badge active">03</div>
+        <div>
+          <div class="card-title">PIN Verification</div>
+          <div class="card-subtitle">Enter your PIN to confirm registration</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="verify-title">Enter your 6-digit PIN</div>
+        <div class="verify-hint" id="verifyHint">Use the keypad below to enter your PIN</div>
+
+        <div class="verify-dots" id="verifyDots">
+          <div class="verify-dot" id="vd0"></div>
+          <div class="verify-dot" id="vd1"></div>
+          <div class="verify-dot" id="vd2"></div>
+          <div class="verify-dot" id="vd3"></div>
+          <div class="verify-dot" id="vd4"></div>
+          <div class="verify-dot" id="vd5"></div>
+        </div>
+
+        <div class="numpad" id="numpad">
+          <div class="key" onclick="numpadPress('1')">1</div>
+          <div class="key" onclick="numpadPress('2')">2</div>
+          <div class="key" onclick="numpadPress('3')">3</div>
+          <div class="key" onclick="numpadPress('4')">4</div>
+          <div class="key" onclick="numpadPress('5')">5</div>
+          <div class="key" onclick="numpadPress('6')">6</div>
+          <div class="key" onclick="numpadPress('7')">7</div>
+          <div class="key" onclick="numpadPress('8')">8</div>
+          <div class="key" onclick="numpadPress('9')">9</div>
+          <div class="key key-empty"></div>
+          <div class="key" onclick="numpadPress('0')">0</div>
+          <div class="key key-del" onclick="numpadDelete()">⌫</div>
+        </div>
+
+        <div id="sec3Status" style="margin-top:16px;"></div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center;padding:14px;" onclick="goToStep2Back()">← Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Success -->
+    <div id="sec4" class="section">
+      <div class="card-body">
+        <div class="success-screen">
+          <div class="success-icon">✓</div>
+          <div class="success-title">PIN Registered!</div>
+          <div class="success-detail">
+            Your PIN has been successfully verified and registered<br/>
+            to your account. Keep it confidential at all times.
+          </div>
+
+          <div class="account-summary" id="summaryBox">
+            <div class="summary-row">
+              <span class="summary-key">Account Holder</span>
+              <span class="summary-val" id="sumName">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Account Number</span>
+              <span class="summary-val" id="sumAcct">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Account Type</span>
+              <span class="summary-val" id="sumType">—</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">PIN Status</span>
+              <span class="summary-val gold">✓ Active &amp; Verified</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-key">Registered On</span>
+              <span class="summary-val" id="sumDate">—</span>
+            </div>
+          </div>
+
+          <button class="btn btn-gold btn-primary" onclick="resetAll()">
+            Register Another Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">
+    🔐 256-bit encrypted · Rural Bank of Calbayog City © 2026
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  // ─── State ───────────────────────────────────────────────────────────
+  let generatedPIN = '';
+  let enteredPIN = '';
+  let pinRevealed = false;
+  let verifyAttempts = 0;
+  const MAX_ATTEMPTS = 3;
+
+  // ─── Step navigation ──────────────────────────────────────────────────
+
+  function showSection(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById('sec'+i).classList.remove('active');
+    });
+    document.getElementById('sec'+n).classList.add('active');
+    updateProgress(n);
+  }
+
+  function updateProgress(step) {
+    [1,2,3,4].forEach(i => {
+      const dot = document.getElementById('pd'+i);
+      const ps  = document.getElementById('ps'+i);
+      dot.classList.remove('current','done');
+      ps.classList.remove('current','done');
+      if (i < step)  { dot.classList.add('done'); ps.classList.add('done'); }
+      if (i === step){ dot.classList.add('current'); ps.classList.add('current'); }
+      if (i < 4) {
+        const line = document.getElementById('pl'+i);
+        line.classList.toggle('done', i < step);
+      }
+    });
+  }
+
+  // ─── Step 1 → 2 ───────────────────────────────────────────────────────
+
+  function goToStep1() { showSection(1); }
+
+  function goToStep2() {
+    const fn   = document.getElementById('firstName').value.trim();
+    const ln   = document.getElementById('lastName').value.trim();
+    const acct = document.getElementById('accountNumber').value.trim();
+    const em   = document.getElementById('email').value.trim();
+    const type = document.getElementById('accountType').value;
+    const dob  = document.getElementById('dob').value.trim();
+    const stat = document.getElementById('sec1Status');
+
+    if (!fn || !ln) { showStatus(stat,'error','Please enter your full name.'); return; }
+    if (!acct || acct.length < 12) { showStatus(stat,'error','Please enter a valid account number (12+ digits).'); return; }
+    if (!em || !em.includes('@')) { showStatus(stat,'error','Please enter a valid email address.'); return; }
+    if (!type) { showStatus(stat,'error','Please select an account type.'); return; }
+    if (!dob)  { showStatus(stat,'error','Please enter your date of birth.'); return; }
+
+    stat.innerHTML = '';
+    showSection(2);
+    // Auto-generate PIN on arrival
+    generatePIN();
+  }
+
+  // ─── Step 2: PIN generation ────────────────────────────────────────────
+
+  function generatePIN() {
+    generatedPIN = '';
+    pinRevealed = false;
+
+    // Cryptographically random 6-digit PIN
+    const arr = new Uint8Array(6);
+    crypto.getRandomValues(arr);
+    for (let i = 0; i < 6; i++) {
+      generatedPIN += (arr[i] % 10).toString();
+    }
+
+    // Reset dots to hidden
+    for (let i = 0; i < 6; i++) {
+      const d = document.getElementById('pd_'+i);
+      d.textContent = '•';
+      d.classList.remove('revealed');
+      d.classList.add('hidden-pin');
+    }
+
+    document.getElementById('revealBtn').disabled = false;
+    document.getElementById('revealBtn').textContent = '👁 Reveal PIN';
+    document.getElementById('confirmPinBtn').disabled = false;
+    document.getElementById('pinInfo').style.display = 'flex';
+
+    // Strength bars
+    showStrengthBars();
+
+    document.getElementById('sec2Status').innerHTML = '';
+  }
+
+  function showStrengthBars() {
+    const row = document.getElementById('strengthRow');
+    row.style.display = 'flex';
+    const colors = ['#f05a5a','#f0a05a','#c9a84c','#4aad7a','#2fd67a'];
+    for (let i = 0; i < 5; i++) {
+      document.getElementById('sb'+i).style.background = colors[i];
+    }
+  }
+
+  function toggleReveal() {
+    pinRevealed = !pinRevealed;
+    const btn = document.getElementById('revealBtn');
+    for (let i = 0; i < 6; i++) {
+      const d = document.getElementById('pd_'+i);
+      if (pinRevealed) {
+        d.textContent = generatedPIN[i];
+        d.classList.add('revealed');
+        d.classList.remove('hidden-pin');
+      } else {
+        d.textContent = '•';
+        d.classList.remove('revealed');
+        d.classList.add('hidden-pin');
+      }
+    }
+    btn.textContent = pinRevealed ? '🙈 Hide PIN' : '👁 Reveal PIN';
+  }
+
+  // ─── Step 3: Verify ────────────────────────────────────────────────────
+
+  function goToStep3() {
+    if (!generatedPIN) {
+      showStatus(document.getElementById('sec2Status'), 'warning', 'Please generate a PIN first.');
+      return;
+    }
+    enteredPIN = '';
+    verifyAttempts = 0;
+    resetVerifyDots('neutral');
+    document.getElementById('verifyHint').textContent = 'Use the keypad below to enter your PIN';
+    document.getElementById('sec3Status').innerHTML = '';
+    showSection(3);
+  }
+
+  function goToStep2Back() {
+    enteredPIN = '';
+    resetVerifyDots('neutral');
+    document.getElementById('sec3Status').innerHTML = '';
+    showSection(2);
+  }
+
+  function numpadPress(digit) {
+    if (enteredPIN.length >= 6) return;
+    enteredPIN += digit;
+    updateVerifyDots();
+    if (enteredPIN.length === 6) {
+      setTimeout(verifyPIN, 300);
+    }
+  }
+
+  function numpadDelete() {
+    if (enteredPIN.length === 0) return;
+    enteredPIN = enteredPIN.slice(0, -1);
+    updateVerifyDots();
+  }
+
+  function updateVerifyDots() {
+    for (let i = 0; i < 6; i++) {
+      const dot = document.getElementById('vd'+i);
+      dot.classList.remove('filled','error','success');
+      if (i < enteredPIN.length) dot.classList.add('filled');
+    }
+  }
+
+  function resetVerifyDots(state) {
+    enteredPIN = '';
+    for (let i = 0; i < 6; i++) {
+      const dot = document.getElementById('vd'+i);
+      dot.classList.remove('filled','error','success');
+      if (state === 'error') dot.classList.add('error');
+      if (state === 'success') dot.classList.add('success');
+    }
+  }
+
+  function verifyPIN() {
+    const stat = document.getElementById('sec3Status');
+
+    if (enteredPIN === generatedPIN) {
+      // Success!
+      resetVerifyDots('success');
+      showStatus(stat, 'success', '✓ PIN verified successfully! Completing registration…');
+      // Disable numpad
+      document.querySelectorAll('.key').forEach(k => k.style.pointerEvents = 'none');
+      setTimeout(goToStep4, 1200);
+    } else {
+      verifyAttempts++;
+      resetVerifyDots('error');
+
+      const remaining = MAX_ATTEMPTS - verifyAttempts;
+      if (remaining > 0) {
+        showStatus(stat, 'error', `✗ Incorrect PIN. ${remaining} attempt${remaining>1?'s':''} remaining.`);
+        setTimeout(() => {
+          resetVerifyDots('neutral');
+          stat.innerHTML = '';
+        }, 1500);
+      } else {
+        // Lockout
+        showStatus(stat, 'error', '🔒 Too many failed attempts. Returning to PIN generation.');
+        document.querySelectorAll('.key').forEach(k => k.style.pointerEvents = 'none');
+        setTimeout(() => {
+          document.querySelectorAll('.key').forEach(k => k.style.pointerEvents = '');
+          goToStep2Back();
+          generatedPIN = '';
+          document.getElementById('confirmPinBtn').disabled = true;
+          document.getElementById('pinInfo').style.display = 'none';
+          for (let i = 0; i < 6; i++) {
+            const d = document.getElementById('pd_'+i);
+            d.textContent = '•'; d.classList.remove('revealed'); d.classList.add('hidden-pin');
+          }
+          document.getElementById('strengthRow').style.display = 'none';
+          showStatus(document.getElementById('sec2Status'), 'warning', 'Please generate a new PIN.');
+        }, 2000);
+      }
+    }
+  }
+
+  // ─── Step 4: Complete ──────────────────────────────────────────────────
+
+  function goToStep4() {
+    const fn   = document.getElementById('firstName').value.trim();
+    const ln   = document.getElementById('lastName').value.trim();
+    const acct = document.getElementById('accountNumber').value.trim();
+    const type = document.getElementById('accountType');
+    const typeText = type.options[type.selectedIndex].text;
+    const now  = new Date();
+
+    document.getElementById('sumName').textContent  = fn + ' ' + ln;
+    document.getElementById('sumAcct').textContent  = maskAccount(acct);
+    document.getElementById('sumType').textContent  = typeText;
+    document.getElementById('sumDate').textContent  = now.toLocaleDateString('en-PH', {
+      year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+
+    showSection(4);
+  }
+
+  function maskAccount(acct) {
+    const clean = acct.replace(/[^0-9]/g,'');
+    if (clean.length <= 4) return acct;
+    return '••••-••••-' + clean.slice(-4);
+  }
+
+  // ─── Reset ─────────────────────────────────────────────────────────────
+
+  function resetAll() {
+    // Clear fields
+    ['firstName','lastName','accountNumber','email','dob'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('accountType').value = '';
+
+    generatedPIN = ''; enteredPIN = ''; pinRevealed = false; verifyAttempts = 0;
+
+    document.getElementById('pinInfo').style.display = 'none';
+    document.getElementById('strengthRow').style.display = 'none';
+    document.getElementById('confirmPinBtn').disabled = true;
+    document.getElementById('revealBtn').disabled = true;
+    document.getElementById('revealBtn').textContent = '👁 Reveal PIN';
+
+    for (let i = 0; i < 6; i++) {
+      const d = document.getElementById('pd_'+i);
+      d.textContent = '•'; d.classList.remove('revealed'); d.classList.add('hidden-pin');
+    }
+
+    document.querySelectorAll('.key').forEach(k => k.style.pointerEvents = '');
+    [1,2,3].forEach(n => document.getElementById('sec'+n+'Status') && (document.getElementById('sec'+n+'Status').innerHTML = ''));
+
+    showSection(1);
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────
+
+  function showStatus(el, type, msg) {
+    el.innerHTML = `<div class="status-bar ${type}"><span>${msg}</span></div>`;
+  }
+
+  // ─── Format account number input ───────────────────────────────────────
+
+  document.getElementById('accountNumber').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/[^0-9]/g,'');
+    let out = '';
+    for (let i = 0; i < v.length && i < 16; i++) {
+      if (i > 0 && i % 4 === 0) out += '-';
+      out += v[i];
+    }
+    e.target.value = out;
+  });
+
+  document.getElementById('dob').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/[^0-9]/g,'');
+    let out = '';
+    for (let i = 0; i < v.length && i < 8; i++) {
+      if (i === 2 || i === 4) out += '/';
+      out += v[i];
+    }
+    e.target.value = out;
+  });
+</script>
+</body>
+</html>
